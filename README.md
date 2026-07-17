@@ -1,51 +1,41 @@
 # Toque Smart Entregas
 
-Aplicación React + TypeScript + Tailwind CSS para recorridos de entrega en iPad.
+React + TypeScript + Vite + Tailwind + PWA.
 
-## Incluye
+## Local development
 
-- PWA instalable y offline.
-- Borradores en IndexedDB.
-- Eliminación de borradores.
-- Recorrido por pasos.
-- Firma con Apple Pencil o dedo.
-- Documento premium de 5 páginas.
-- PDF multipágina con jsPDF + html2canvas.
-- GitHub Actions para despliegue automático a GitHub Pages.
-- Ejemplo de endpoint de correo con Resend.
-
-## Desarrollo local
+Requirements: Node.js 22 and npm.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Node.js 22 recomendado.
+Open the local URL shown by Vite.
 
-## Build
+## Test the production build locally
 
 ```bash
 npm run build
 npm run preview
 ```
 
-## GitHub Pages
+## Deploy to GitHub Pages
 
-1. Subir el repositorio a GitHub.
-2. En **Settings → Pages**, seleccionar **GitHub Actions** como fuente.
-3. Cada push a `main` ejecutará `.github/workflows/deploy.yml`.
+This project includes `.github/workflows/deploy.yml`.
+The workflow automatically detects whether the repository is:
 
-## Email automático
+- a user site: `USERNAME.github.io` → base `/`
+- a project site: any other repository → base `/REPOSITORY-NAME/`
 
-GitHub Pages no ejecuta backend. El ejemplo `api/send-delivery.ts` puede desplegarse en Vercel.
-Configurar:
+In GitHub:
 
-- `RESEND_API_KEY`
-- `FROM_EMAIL` con dominio verificado
+1. Repository → Settings → Pages.
+2. Under **Build and deployment**, select **GitHub Actions** as the source.
+3. Push the complete project to the `main` branch.
+4. Open the **Actions** tab and wait for the workflow to finish with a green check.
+5. Open the URL shown in the deploy job.
 
-Luego conectar el frontend al endpoint para enviar el PDF al cliente y copiar a `soporte@toquesmart.com`.
+Important: source files must be at the repository root. `package.json`, `vite.config.ts`, `src/`, `public/`, and `.github/` must not be inside an extra folder.
 
-## Estado de esta entrega
-
-Esta es la primera base profesional. La siguiente iteración debe conectar el PDF generado al endpoint de correo y añadir autenticación/sincronización central.
+Do not publish the source `index.html` directly with “Deploy from a branch”. Vite must build the project and GitHub Pages must publish the generated `dist` artifact.

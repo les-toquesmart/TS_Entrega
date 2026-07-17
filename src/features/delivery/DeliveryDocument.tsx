@@ -1,11 +1,12 @@
 import type { DeliveryProject } from '../../types/delivery'
 import { SUPPORT_EMAIL, SUPPORT_WHATSAPP, SYSTEMS, VERIFICATION_ITEMS } from '../../lib/constants'
+import { ASSETS } from '../../lib/assets'
 
 interface Props { delivery: DeliveryProject }
 const mark = (value: boolean) => value ? '✓' : '□'
 
 function Header({ page }: { page: number }) {
-  return <div className="document-header"><img src="./assets/logo-dark.png" /><span>ACTA DE ENTREGA <b>{page}</b></span></div>
+  return <div className="document-header"><img src={ASSETS.logoDark} /><span>ACTA DE ENTREGA <b>{page}</b></span></div>
 }
 function Footer() {
   return <div className="document-footer"><span>● &nbsp; Tecnología integrada a tu vida.</span><span>toquesmart.com</span></div>
@@ -17,8 +18,8 @@ export function DeliveryDocument({ delivery }: Props) {
     <div className="document-stack">
       <section className="document-page document-cover" data-pdf-page>
         <div className="cover-hero">
-          <div className="cover-copy"><img src="./assets/logo-white.png"/><h1>ACTA DE<br/><strong>ENTREGA</strong><br/>Y ACEPTACIÓN<br/>DE PROYECTO</h1><span>TECNOLOGÍA<br/>INTEGRADA A TU VIDA.</span></div>
-          <div className="cover-photo"><img src={p.coverImage || './assets/default-cover.png'} /></div>
+          <div className="cover-copy"><img src={ASSETS.logoWhite}/><h1>ACTA DE<br/><strong>ENTREGA</strong><br/>Y ACEPTACIÓN<br/>DE PROYECTO</h1><span>TECNOLOGÍA<br/>INTEGRADA A TU VIDA.</span></div>
+          <div className="cover-photo"><img src={p.coverImage || ASSETS.defaultCover} /></div>
         </div>
         <div className="cover-info">
           <dl><dt>Proyecto</dt><dd>{p.name}</dd><dt>Cliente</dt><dd>{p.clientName}</dd><dt>Correo</dt><dd>{p.clientEmail}</dd><dt>Dirección</dt><dd>{p.address}</dd><dt>Fecha</dt><dd>{p.deliveryDate}</dd><dt>Representante</dt><dd>{p.representative}</dd></dl>

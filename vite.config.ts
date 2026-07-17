@@ -3,10 +3,10 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-const repoBase = '/TS_Entrega/'
+const basePath = '/TS_Entrega/'
 
 export default defineConfig({
-  base: repoBase,
+  base: basePath,
   plugins: [
     react(),
     tailwindcss(),
@@ -23,20 +23,19 @@ export default defineConfig({
         name: 'Toque Smart Entregas',
         short_name: 'TS Entregas',
         description: 'Actas de entrega y aceptación de proyectos Toque Smart',
-        start_url: repoBase,
-        scope: repoBase,
         theme_color: '#102638',
         background_color: '#eef2f5',
         display: 'standalone',
         orientation: 'portrait',
-        lang: 'es',
+        start_url: basePath,
+        scope: basePath,
         icons: [
-          { src: `${repoBase}assets/icon-192.png`, sizes: '192x192', type: 'image/png' },
-          { src: `${repoBase}assets/icon-512.png`, sizes: '512x512', type: 'image/png' },
+          { src: `${basePath}assets/icon-192.png`, sizes: '192x192', type: 'image/png' },
+          { src: `${basePath}assets/icon-512.png`, sizes: '512x512', type: 'image/png' },
         ],
       },
       workbox: {
-        navigateFallback: `${repoBase}index.html`,
+        navigateFallback: `${basePath}index.html`,
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
