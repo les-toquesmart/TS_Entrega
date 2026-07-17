@@ -1,6 +1,8 @@
 import type { DeliveryProject } from '../types/delivery'
 import { SYSTEMS, VERIFICATION_ITEMS } from './constants'
 
+const asset = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`
+
 export function createDelivery(): DeliveryProject {
   const now = new Date().toISOString()
   return {
@@ -10,7 +12,7 @@ export function createDelivery(): DeliveryProject {
     updatedAt: now,
     project: {
       name: '', clientName: '', clientEmail: '', clientPhone: '', address: '',
-      deliveryDate: now.slice(0, 10), representative: '', scope: '', coverImage: './assets/default-cover.png'
+      deliveryDate: now.slice(0, 10), representative: '', scope: '', coverImage: asset('default-cover.png')
     },
     systems: Object.fromEntries(SYSTEMS.map((item) => [item, ''])),
     verification: Object.fromEntries(VERIFICATION_ITEMS.map((item) => [item, false])),
