@@ -1,5 +1,5 @@
 export const SUPPORT_EMAIL = 'soporte@toquesmart.com'
-export const SUPPORT_WHATSAPP = '(809) 000-0000'
+export const SUPPORT_WHATSAPP = '809.893.7588'
 
 export const SYSTEMS = [
   'Red y WiFi',

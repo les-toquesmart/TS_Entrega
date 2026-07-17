@@ -1,7 +1,7 @@
 import type { DeliveryProject } from '../../types/delivery'
 import { SUPPORT_EMAIL, SUPPORT_WHATSAPP, SYSTEMS, VERIFICATION_ITEMS } from '../../lib/constants'
 import { ASSETS } from '../../lib/assets'
-import { Clock3, Mail, MessageCircle } from 'lucide-react'
+import { Building2, CalendarDays, Clock3, FileText, Mail, MapPin, MessageCircle, UserRound } from 'lucide-react'
 
 interface Props { delivery: DeliveryProject }
 const mark = (value: boolean) => value ? '✓' : '□'
@@ -23,8 +23,8 @@ export function DeliveryDocument({ delivery }: Props) {
           <div className="cover-photo"><img src={p.coverImage || ASSETS.defaultCover} /></div>
         </div>
         <div className="cover-info">
-          <dl><dt>Proyecto</dt><dd>{p.name}</dd><dt>Cliente</dt><dd>{p.clientName}</dd><dt>Correo</dt><dd>{p.clientEmail}</dd><dt>Dirección</dt><dd>{p.address}</dd><dt>Fecha</dt><dd>{p.deliveryDate}</dd><dt>Representante</dt><dd>{p.representative}</dd></dl>
-          <div className="cover-scope"><h2>Alcance del proyecto</h2><p>{p.scope}</p></div>
+          <div className="cover-details"><div><Building2/><small>Proyecto</small><strong>{p.name || 'Sin nombre'}</strong></div><div><UserRound/><small>Cliente</small><strong>{p.clientName || 'Sin cliente'}</strong></div><div><Mail/><small>Correo</small><strong>{p.clientEmail || '—'}</strong></div><div><MapPin/><small>Dirección</small><strong>{p.address || '—'}</strong></div><div><CalendarDays/><small>Entrega</small><strong>{p.deliveryDate || '—'}</strong></div><div><UserRound/><small>Representante</small><strong>{p.representative || '—'}</strong></div></div>
+          <div className="cover-scope"><FileText/><h2>Alcance del proyecto</h2><p>{p.scope || 'Alcance documentado en la revisión de entrega.'}</p></div>
         </div>
         <div className="cover-footer"><span>toquesmart.com</span><span>Somos arquitectos de una vida integrada.</span><b>1</b></div>
       </section>
