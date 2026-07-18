@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Check, ChevronRight, FilePlus2, Save, Trash2, X } from 'lucide-react'
+import { Check, ChevronRight, FilePlus2, Mail, Save, Trash2, X } from 'lucide-react'
 import { createDelivery } from './lib/delivery'
 import { deleteDelivery, getDeliveries, saveDelivery } from './lib/db'
 import { generatePdf } from './lib/pdf'
@@ -8,16 +8,20 @@ import type { DeliveryProject, SystemOwner } from './types/delivery'
 import { SignaturePad } from './components/SignaturePad'
 import { DeliveryDocument } from './features/delivery/DeliveryDocument'
 import { ASSETS } from './lib/assets'
+import { sendDeliveryEmail } from './lib/email'
+import { validateDelivery } from './lib/validation'
 
 export default function App() {
   const [delivery, setDelivery] = useState<DeliveryProject>(createDelivery)
   const [deliveries, setDeliveries] = useState<DeliveryProject[]>([])
   const [step, setStep] = useState(0)
   const [preview, setPreview] = useState(false)
+  const [notice, setNotice] = useState('')
   const documentRef = useRef<HTMLDivElement>(null)
 
   const refresh = async () => setDeliveries(await getDeliveries())
   useEffect(() => { refresh() }, [])
+  useEffect(() => { const timer = window.setTimeout(() => { void saveDelivery(delivery) }, 900); return () => window.clearTimeout(timer) }, [delivery])
 
   const patch = (fn: (draft: DeliveryProject) => void) => {
     setDelivery((current) => { const next = structuredClone(current); fn(next); next.updatedAt = new Date().toISOString(); return next })
@@ -40,18 +44,19 @@ export default function App() {
   ], [delivery])
 
   const finalize = async () => {
-    const missing = []
-    if (!delivery.project.name) missing.push('proyecto')
-    if (!delivery.project.clientName) missing.push('cliente')
-    if (!delivery.project.clientEmail) missing.push('correo')
-    if (!delivery.termsAccepted) missing.push('aceptación de términos')
-    if (!delivery.signatures.client) missing.push('firma del cliente')
-    if (!delivery.signatures.representative) missing.push('firma de Toque Smart')
+    const missing = validateDelivery(delivery)
     if (missing.length) return alert(`Falta completar: ${missing.join(', ')}`)
     patch((d) => { d.status = 'finalized' })
     await saveDelivery({ ...delivery, status: 'finalized' })
     await refresh()
     setPreview(true)
+  }
+
+  const sendEmail = async () => {
+    if (!documentRef.current) return
+    const missing = validateDelivery(delivery)
+    if (missing.length) return setNotice(`Completa antes de enviar: ${missing.join(', ')}.`)
+    try { setNotice('Preparando y enviando el acta…'); const pdf = await generatePdf(documentRef.current, `Acta_${delivery.project.name || 'Proyecto'}.pdf`); await sendDeliveryEmail(delivery, pdf); setNotice('Acta enviada correctamente.') } catch (error) { setNotice(error instanceof Error ? error.message : 'No se pudo enviar el acta.') }
   }
 
   const exportPdf = async () => {
@@ -63,7 +68,8 @@ export default function App() {
     <header className="app-header"><div className="brand"><img src={ASSETS.logoWhite}/><div><strong>Entregas</strong><small>Calidad, experiencia y postventa</small></div></div><div className="header-actions"><button onClick={() => setDelivery(createDelivery())}><FilePlus2/>Nuevo</button><button onClick={save}><Save/>Guardar</button><button className="primary" onClick={() => setPreview(true)}>Vista previa</button></div></header>
     <main className="app-shell"><aside className="sidebar"><p className="eyebrow">Recorrido de entrega</p><nav>{STEPS.map(([title, subtitle], index) => <button className={step === index ? 'active' : ''} onClick={() => setStep(index)} key={title}><span>{index + 1}</span><div><b>{title}</b><small>{subtitle}</small></div>{complete[index] && <Check/>}</button>)}</nav><div className="drafts-title"><p className="eyebrow">Borradores</p><span>{deliveries.length}</span></div><div className="draft-list">{deliveries.map((item) => <div className="draft" key={item.id}><button onClick={() => setDelivery(item)}><b>{item.project.name || 'Sin nombre'}</b><small>{item.project.clientName || 'Sin cliente'} · {item.status === 'finalized' ? 'Finalizado' : 'Borrador'}</small></button><button className="delete" onClick={() => remove(item.id)}><Trash2/></button></div>)}</div></aside>
     <section className="workspace">{renderStep(step, delivery, patch, finalize)}</section></main>
-    {preview && <div className="preview-overlay"><div className="preview-toolbar"><strong>Vista previa final</strong><div><button onClick={exportPdf}>Descargar PDF</button><button onClick={() => window.print()}>Imprimir</button><button onClick={() => setPreview(false)}><X/></button></div></div><div className="preview-scroll" ref={documentRef}><DeliveryDocument delivery={delivery}/></div></div>}
+    {notice && <div className="app-notice" role="status">{notice}<button onClick={() => setNotice('')}><X/></button></div>}
+    {preview && <div className="preview-overlay"><div className="preview-toolbar"><strong>Vista previa final</strong><div><button onClick={exportPdf}>Descargar PDF</button><button onClick={sendEmail}><Mail/>Enviar acta</button><button onClick={() => window.print()}>Imprimir</button><button onClick={() => setPreview(false)}><X/></button></div></div><div className="preview-scroll" ref={documentRef}><DeliveryDocument delivery={delivery}/></div></div>}
   </>
 }
 
