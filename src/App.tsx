@@ -17,11 +17,18 @@ export default function App() {
   const [step, setStep] = useState(0)
   const [preview, setPreview] = useState(false)
   const [notice, setNotice] = useState('')
+  const [ready, setReady] = useState(false)
   const documentRef = useRef<HTMLDivElement>(null)
 
   const refresh = async () => setDeliveries(await getDeliveries())
-  useEffect(() => { refresh() }, [])
-  useEffect(() => { const timer = window.setTimeout(() => { void saveDelivery(delivery) }, 900); return () => window.clearTimeout(timer) }, [delivery])
+  useEffect(() => { void refresh().finally(() => setReady(true)) }, [])
+  useEffect(() => {
+    if (!ready) return
+    const hasContent = Boolean(delivery.project.name.trim() || delivery.project.clientName.trim() || delivery.project.clientEmail.trim() || delivery.project.scope.trim())
+    if (!hasContent) return
+    const timer = window.setTimeout(() => { void saveDelivery(delivery) }, 900)
+    return () => window.clearTimeout(timer)
+  }, [delivery, ready])
 
   const patch = (fn: (draft: DeliveryProject) => void) => {
     setDelivery((current) => { const next = structuredClone(current); fn(next); next.updatedAt = new Date().toISOString(); return next })
