@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Check, ChevronRight, FilePlus2, Mail, Save, Trash2, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, ChevronRight, FilePlus2, Mail, Save, Trash2, X } from 'lucide-react'
 import { createDelivery } from './lib/delivery'
 import { deleteDelivery, getDeliveries, saveDelivery } from './lib/db'
 import { generatePdf } from './lib/pdf'
@@ -74,7 +74,7 @@ export default function App() {
   return <>
     <header className="app-header"><div className="brand"><img src={ASSETS.logoWhite}/><div><strong>Entregas</strong><small>Calidad, experiencia y postventa</small></div></div><div className="header-actions"><button onClick={() => setDelivery(createDelivery())}><FilePlus2/>Nuevo</button><button onClick={save}><Save/>Guardar</button><button className="primary" onClick={() => setPreview(true)}>Vista previa</button></div></header>
     <main className="app-shell"><aside className="sidebar"><p className="eyebrow">Recorrido de entrega</p><nav>{STEPS.map(([title, subtitle], index) => <button className={step === index ? 'active' : ''} onClick={() => setStep(index)} key={title}><span>{index + 1}</span><div><b>{title}</b><small>{subtitle}</small></div>{complete[index] && <Check/>}</button>)}</nav><div className="drafts-title"><p className="eyebrow">Borradores</p><span>{deliveries.length}</span></div><div className="draft-list">{deliveries.map((item) => <div className="draft" key={item.id}><button onClick={() => setDelivery(item)}><b>{item.project.name || 'Sin nombre'}</b><small>{item.project.clientName || 'Sin cliente'} · {item.status === 'finalized' ? 'Finalizado' : 'Borrador'}</small></button><button className="delete" onClick={() => remove(item.id)}><Trash2/></button></div>)}</div></aside>
-    <section className="workspace">{renderStep(step, delivery, patch, finalize)}</section></main>
+    <section className="workspace">{renderStep(step, delivery, patch, finalize)}<div className="step-navigation"><button className="step-navigation__previous" onClick={() => setStep((current) => Math.max(0, current - 1))} disabled={step === 0}><ArrowLeft/>Anterior</button>{step < STEPS.length - 1 && <button className="step-navigation__next" onClick={() => setStep((current) => Math.min(STEPS.length - 1, current + 1))}>Siguiente<ArrowRight/></button>}</div></section></main>
     {notice && <div className="app-notice" role="status">{notice}<button onClick={() => setNotice('')}><X/></button></div>}
     {preview && <div className="preview-overlay"><div className="preview-toolbar"><strong>Vista previa final</strong><div><button onClick={exportPdf}>Descargar PDF</button><button onClick={sendEmail}><Mail/>Enviar acta</button><button onClick={() => window.print()}>Imprimir</button><button onClick={() => setPreview(false)}><X/></button></div></div><div className="preview-scroll" ref={documentRef}><DeliveryDocument delivery={delivery}/></div></div>}
   </>
